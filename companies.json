@@ -1,0 +1,31 @@
+[
+  {"name": "Razorpay", "ats": "greenhouse", "slug": "razorpaysoftwareprivatelimited"},
+  {"name": "InMobi", "ats": "greenhouse", "slug": "inmobi"},
+  {"name": "CRED", "ats": "lever", "slug": "cred"},
+  {"name": "Meesho", "ats": "lever", "slug": "meesho"},
+  {
+    "name": "Groww",
+    "ats": "greenhouse",
+    "slug": "groww"
+  },
+  {
+    "name": "Postman",
+    "ats": "greenhouse",
+    "slug": "postman"
+  },
+  {
+    "name": "Slice",
+    "ats": "greenhouse",
+    "slug": "slice"
+  },
+  {
+    "name": "PhonePe",
+    "ats": "greenhouse",
+    "slug": "phonepe"
+  },
+  {
+    "name": "Drivetrain",
+    "ats": "lever",
+    "slug": "drivetrain"
+  }
+]

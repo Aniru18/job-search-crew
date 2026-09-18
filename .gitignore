@@ -1,0 +1,17 @@
+# Secrets -- never commit these
+.env
+
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated at runtime -- not needed in the repo
+resume_cache.json
+uploads/*
+!uploads/.gitkeep
+
+# OS/editor noise
+.DS_Store

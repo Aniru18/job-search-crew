@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispatch — automated job search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EEF2F1;
+    --paper: #FFFFFF;
+    --ink: #16241F;
+    --ink-soft: #4B5A54;
+    --teal: #0E6E63;
+    --teal-dark: #0A544C;
+    --amber: #C97A2A;
+    --line: #D7DFDC;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 56px;
+  }
+  .mark {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: var(--teal-dark);
+  }
+  .mark::before { content: "◆ "; }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 42px;
+    line-height: 1.15;
+    margin: 0 0 16px;
+    max-width: 480px;
+  }
+  .sub {
+    color: var(--ink-soft);
+    font-size: 16px;
+    max-width: 460px;
+    margin: 0 0 40px;
+  }
+  form {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+  .field { margin-bottom: 20px; }
+  .field:last-of-type { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  input[type="email"], input[type="file"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    background: #FBFCFB;
+  }
+  input[type="email"]:focus, input[type="file"]:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+  }
+  .error {
+    color: #A3402D;
+    font-size: 13px;
+    margin-top: 6px;
+    display: none;
+  }
+  button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--teal);
+    color: #F4FAF8;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  button:hover:not(:disabled) { background: var(--teal-dark); }
+  button:disabled { background: #A8B8B4; cursor: not-allowed; }
+
+  .status {
+    margin-top: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    display: none;
+  }
+  .status.visible { display: block; }
+  .status .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+    margin-right: 8px;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .results { margin-top: 48px; display: none; }
+  .results.visible { display: block; }
+  .results h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+  .job {
+    display: flex;
+    gap: 16px;
+    padding: 20px 0;
+    border-top: 1px solid var(--line);
+  }
+  .job:first-of-type { border-top: none; }
+  .job-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--teal-dark);
+    padding-top: 2px;
+    flex-shrink: 0;
+    width: 24px;
+  }
+  .job-body { flex: 1; }
+  .job-title { font-weight: 600; font-size: 15px; margin: 0 0 2px; }
+  .job-meta {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+  }
+  .job-summary {
+    font-size: 14px;
+    color: var(--ink);
+    margin: 0 0 14px;
+  }
+  .apply-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--ink);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .apply-btn:hover { background: var(--teal-dark); }
+
+  footer {
+    margin-top: 64px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <span class="mark">dispatch</span>
+    </header>
+
+    <h1>Five good jobs, delivered to your inbox.</h1>
+    <p class="sub">Upload your resume once. We check company career pages directly and send you the best matches with real apply links — no scrolling job boards.</p>
+
+    <form id="search-form">
+      <div class="field">
+        <label for="resume">Resume (PDF)</label>
+        <input type="file" id="resume" name="resume" accept="application/pdf" required>
+      </div>
+      <div class="field">
+        <label for="email">Send results to</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        <div class="error" id="email-error">Enter a valid email address.</div>
+      </div>
+      <button type="submit" id="submit-btn">Find my top 5 jobs</button>
+
+      <div class="status" id="status">
+        <span class="dot"></span><span id="status-text">Starting search…</span>
+      </div>
+    </form>
+
+    <div class="results" id="results">
+      <h2>Your matches</h2>
+      <div id="job-list"></div>
+    </div>
+
+    <footer>Results are also emailed to the address above.</footer>
+  </div>
+
+<script>
+const form = document.getElementById('search-form');
+const submitBtn = document.getElementById('submit-btn');
+const statusEl = document.getElementById('status');
+const statusText = document.getElementById('status-text');
+const resultsEl = document.getElementById('results');
+const jobList = document.getElementById('job-list');
+const emailInput = document.getElementById('email');
+const emailError = document.getElementById('email-error');
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function renderJobs(jobs) {
+  jobList.innerHTML = '';
+  jobs.forEach((job, i) => {
+    const div = document.createElement('div');
+    div.className = 'job';
+    div.innerHTML = `
+      <div class="job-num">${String(i + 1).padStart(2, '0')}</div>
+      <div class="job-body">
+        <p class="job-title">${job.title || ''}</p>
+        <p class="job-meta">${job.company || ''} · ${job.location || ''}</p>
+        <p class="job-summary">${job.summary || ''}</p>
+        <a class="apply-btn" href="${job.apply_url || '#'}" target="_blank" rel="noopener">Apply now</a>
+      </div>
+    `;
+    jobList.appendChild(div);
+  });
+  resultsEl.classList.add('visible');
+}
+
+async function pollStatus(jobId) {
+  const res = await fetch(`/status/${jobId}`);
+  const data = await res.json();
+
+  if (data.status === 'running') {
+    statusText.textContent = 'Searching company career pages…';
+    setTimeout(() => pollStatus(jobId), 3000);
+  } else if (data.status === 'completed') {
+    statusText.textContent = `Done — found ${data.jobs_found_total} jobs, sent top ${data.jobs_sent.length}.`;
+    submitBtn.disabled = false;
+    renderJobs(data.jobs_sent);
+  } else if (data.status === 'failed') {
+    statusText.textContent = `Something went wrong: ${data.error}`;
+    submitBtn.disabled = false;
+  }
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  if (!EMAIL_RE.test(emailInput.value)) {
+    emailError.style.display = 'block';
+    return;
+  }
+  emailError.style.display = 'none';
+
+  submitBtn.disabled = true;
+  statusEl.classList.add('visible');
+  statusText.textContent = 'Uploading resume…';
+  resultsEl.classList.remove('visible');
+
+  const formData = new FormData(form);
+
+  try {
+    const res = await fetch('/run-search', { method: 'POST', body: formData });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Request failed');
+    }
+    const data = await res.json();
+    statusText.textContent = 'Analyzing resume…';
+    pollStatus(data.job_id);
+  } catch (err) {
+    statusText.textContent = `Error: ${err.message}`;
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
